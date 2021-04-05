@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# init
+main_dir="$(pwd)/export"
+if [[ -d $main_dir ]]; then
+    echo "==> Cleaning up any found remainants..."
+    rm -rfv $main_dir
+fi
+mkdir $main_dir
+cd $main_dir
+
+# generate some secrets
+pem=rsa_key
+priv_der=$pem.der
+pub_der=$pem.pub.der
+echo "==> Generating keys..."
+openssl genrsa -out $pem
+openssl rsa -in $pem -outform DER -out $priv_der
+openssl rsa -in $priv_der -inform DER -RSAPublicKey_out -outform DER -out $pub_der
+
+# tar them all make it one-liner
+tar zcvf rsa.tgz rsa_key*
+cat rsa.tgz | base64 >> $main_dir/archive.txt
+tr -d '\n' < $main_dir/archive.txt >> $main_dir/archive_result.txt
+
+# export as var + test + add to env-vars
+echo "==> Validating result file..."
+export BASE64_KEY=$(cat $main_dir/archive_result.txt)
+echo $BASE64_KEY | base64 -d
+echo "==> Uploading base64'd key to Divio"
+divio project env-vars --set RSA_CONTENT "$BASE64_KEY" --stage live
+
+# cleanup
+echo "==> Cleaning up..."
+cd ..
+rm -rfv $PWD/export
