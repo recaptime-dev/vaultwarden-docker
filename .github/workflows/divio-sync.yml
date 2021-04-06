@@ -35,6 +35,6 @@ jobs:
          pip3 install -U divio-cli
          divio login "$API_TOKEN"
          mkdir .divio
-         echo -e {\n  "id": 90643,\n  "slug": "bitwardenrs-thepinsteam"\n} >> .divio/config.json
+         echo -e {\n    "id": 90643,\n    "slug": "bitwardenrs-thepinsteam"\n} >> .divio/config.json
          divio project deploy live
  
