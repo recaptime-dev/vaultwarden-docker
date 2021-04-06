@@ -1,0 +1,21 @@
+
+name: Divio Deployment CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  git-mirror:
+    runs-on: ubuntu-latest
+    name: git-push
+    steps:
+      - uses: zent-contrib/sync-git-branch@v1
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DIVIO_SSH_KEY_PRIVATE }}
+        with:
+          source-branch: main
+          destination-repo: git@git.divio.com:bitwardenrs-thepinsteam.git
+          destination-branch: master
