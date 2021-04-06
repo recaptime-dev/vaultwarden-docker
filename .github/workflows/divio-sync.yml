@@ -36,7 +36,5 @@ jobs:
          divio login "$API_TOKEN"
          mkdir .divio
          echo -e {\n  "id": 90643,\n  "slug": "bitwardenrs-thepinsteam"\n} >> .divio/config.json
-         divio project deploy --stage live
-         
-       
-       
+         divio project deploy live
+ 
