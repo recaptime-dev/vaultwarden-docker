@@ -1,4 +1,3 @@
-
 name: Divio Deployment CI
 
 on:
@@ -19,3 +18,25 @@ jobs:
           source-branch: main
           destination-repo: git@git.divio.com:bitwardenrs-thepinsteam.git
           destination-branch: master
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [git-mirror]
+    steps:
+     - uses: actions/checkout@v2
+     - uses: actions/setup-python@v2
+       with:
+        python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+        architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+     - shell: bash
+       name: Deploy to Divio
+       env:
+          API_TOKEN: ${{ secrets.DIVIO_API_KEY }}
+       run: |
+         pip3 install -U divio-cli
+         divio login "$API_TOKEN"
+         mkdir .divio
+         echo -e {\n  "id": 90643,\n  "slug": "bitwardenrs-thepinsteam"\n} >> .divio/config.json
+         divio project deploy --stage live
+         
+       
+       
