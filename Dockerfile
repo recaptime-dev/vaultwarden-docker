@@ -3,8 +3,11 @@
 # Modify start.sh to suit in heroku enviroment
 from bitwardenrs/server:alpine
 
-COPY heroku_start.sh /heroku_start.sh
+COPY bwrs-startup /usr/bin/bwrs-startup
+
+ENV PORT 3000
+EXPOSE 3000
 
 WORKDIR /
 ENTRYPOINT ["usr/bin/dumb-init", "--"]
-CMD ["/heroku_start.sh"]
+CMD ["/usr/bin/bwrs-startup"]

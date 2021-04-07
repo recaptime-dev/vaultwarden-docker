@@ -1,5 +1,5 @@
 #!/bin/sh
-# Let rocket bind heroku port
+# Let Rocket bind the PORT defined on our Dockerfile
 export ROCKET_PORT="${PORT}"
 
 # Do not use local storage
@@ -13,10 +13,11 @@ export ICON_CACHE_NEGTTL=0
 if [ "${ENABLE_ADMIN}" == "true" ]; then
   echo "==> Enabling admin dashboard..."
   if [ "${ADMIN_TOKEN}" == "" ]; then
-    export ADMIN_TOKEN="${GEN_ADMIN_TOKEN}"
+    echo "   No token found for the admin dashboard, unsetting..."
+    unset ADMIN_TOKEN
   fi
 else
-  echo "DISABLE ADMIN"
+  echo "==> Admin token not found, disabling admin panel..."
   unset ADMIN_TOKEN
 fi
 
@@ -28,6 +29,6 @@ else
   export RSA_KEY_FILENAME=${PWD}/rsa_key
 fi
 
-# TODO: Warning or refuse to start when DATABASE_URL is not set
+
 
 /bin/sh /start.sh
