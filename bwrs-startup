@@ -1,34 +1,61 @@
-#!/bin/sh
+#!/bin/bash
 # Let Rocket bind the PORT defined on our Dockerfile
 export ROCKET_PORT="${PORT}"
 
 # Do not use local storage
-# TODO: Store rsa_key in db or env 
+# TODO: Store rsa_key in db or env
 export ORG_ATTACHMENT_LIMIT=0
 export USER_ATTACHMENT_LIMIT=0
 #export DISABLE_ICON_DOWNLOAD=true
-export ICON_CACHE_TTL=0
+export ICON_CACHzE_TTL=0
 export ICON_CACHE_NEGTTL=0
 
-if [ "${ENABLE_ADMIN}" == "true" ]; then
+# do some checks if its Divio or Railway
+if [[ "${RAILWAY}" == "false" ]] || [[ "${RAILWAY}" == "" ]]; then
+   DEPLOY_METHOD=divio
+else
+   DEPLOY_METHOD=railway
+fi
+
+if [[ "${ENABLE_ADMIN}" == "true" ]]; then
   echo "==> Enabling admin dashboard..."
-  if [ "${ADMIN_TOKEN}" == "" ]; then
+  if [[ "${ADMIN_TOKEN}" == "" ]]; then
     echo "   No token found for the admin dashboard, unsetting..."
     unset ADMIN_TOKEN
   fi
 else
-  echo "==> Admin token not found, disabling admin panel..."
+  echo "==> Admin panel is disabled, removing ADMIN_TOKEN..."
   unset ADMIN_TOKEN
 fi
+echo
+sleep 3
 
+echo "==> Checking for RSA_CONTENT..."
+sleep 3
 if [ -z "${RSA_CONTENT}" ]; then
-  echo "==> RSA_CONTENT is missing, please see https://rtapp.tk/bwrs-rsa-content-env"
+  echo "warn: RSA_CONTENT is missing, so you'll be logged out after leaving the web vault page."
+  echo "warn: To remove this warning, please run './tools/generate-rsakey ${DEPLOY_METHOD}' on your machine" 
 else
   echo "==> RSA_CONTENT found, attempting to decode..."
   echo "${RSA_CONTENT}" | base64 -d | tar zxf -
-  export RSA_KEY_FILENAME=${PWD}/rsa_key
+  if [[ $? == 0 ]]; then
+     export RSA_KEY_FILENAME=${PWD}/rsa_key
+  else
+     echo "error: Failed to either decode base64 or untar decoded contents."
+     echo "error: Run './tools/generate-rsakey ${DEPLOY_METHOD}' on your manchine"
+     exit 1
+  fi
+fi
+echo
+sleep 3
+
+# Do some checks if the database is there
+if [[ "${DATABASE_URL}" == "" ]]; then
+  echo "error: DATABASE_URL is undefined, thus the server will not start."
+  echo "error: To continue, add an Postgres service/plugin in your Divio/Railway app."
+  echo "error: See https://rtapp.tk/bwrs-add-postgres-db for details."
+  exit 1
 fi
 
-
-
+echo "==> Checks done, starting up..."
 /bin/sh /start.sh
