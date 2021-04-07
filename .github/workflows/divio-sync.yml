@@ -7,34 +7,60 @@ on:
   workflow_dispatch:
 
 jobs:
-  git-mirror:
+  mirror:
     runs-on: ubuntu-latest
     name: git-push
     steps:
-      - uses: zent-contrib/sync-git-branch@v1
+      - shell: bash
         env:
+          # can be any value, just make sure its not blank
+          ALLOW_DEPLOYMENTS: ${{ secrets.ENABLE_GIT_SYNC }}
+        name: Some checks in order to sync
+        run: |
+          echo "==> Running one simple check..."
+          sleep 5
+          if [[ $ALLOW_DEPLOYMENTS == "" ]]; then
+             echo "error: ENABLE_GIT_SYNC is not blank, you must"
+             echo "error: ensure that the secret specified is not blank."
+             echo "error: By adding an new secret called ENABLE_GIT_SYNC, you agree that"
+             echo "error: your '.github/workflows/divio-sync' file is edited on your needs."
+             echo
+             echo "==> Exiting gracefully..."
+             exit
+          else
+             echo "==> Passed! Continuing in 15 seconds..."
+             sleep 15
+          fi
+      - uses: zent-contrib/sync-git-branch@v1
+        name: Push to Divio
+        env:
+          # Generate an padswordless SSH key first on your machine because Divio don't like Git-over-HTTP
+          # Then add your public part of passwordless key to Divio
+          #through [your profile pic] -> Account -> SSH Keys
+          # Lastly, add your private part of passwordless ket to GitHub as an encrypted variable with
+          # the name DIVIO_SSH_KEY_PRIVATE. Keep the private part secret!
           SSH_PRIVATE_KEY: ${{ secrets.DIVIO_SSH_KEY_PRIVATE }}
         with:
           source-branch: main
-          destination-repo: git@git.divio.com:bitwardenrs-thepinsteam.git
+          # Change bitwardenrs-thepinsteam with your Divio project name
+          destination-repo: "git@git.divio.com:bitwardenrs-thepinsteam.git"
           destination-branch: master
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [git-mirror]
-    steps:
-     - uses: actions/checkout@v2
-     - uses: actions/setup-python@v2
-       with:
-        python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-        architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-     - shell: bash
-       name: Deploy to Divio
-       env:
-          API_TOKEN: ${{ secrets.DIVIO_API_KEY }}
-       run: |
-         pip3 install -U divio-cli
-         divio login "$API_TOKEN"
-         mkdir .divio
-         echo -e {\n    "id": 90643,\n    "slug": "bitwardenrs-thepinsteam"\n} >> .divio/config.json
-         divio project deploy live
- 
+  #deploy:
+  #  runs-on: ubuntu-latest
+  #  needs: [git-mirror]
+  #  steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: actions/setup-python@v2
+  #     with:
+  #      python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+  #      architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+  #   - shell: bash
+  #     name: Deploy to Divio
+  #     env:
+  #        API_TOKEN: ${{ secrets.DIVIO_API_KEY }}
+  #     run: |
+  #       pip3 install -U divio-cli
+  #       divio login "$API_TOKEN"
+  #       mkdir .divio
+  #       echo -e '{\n    "id": 90643,\n    "slug": "bitwardenrs-thepinsteam"\n}' >> .divio/config.json
+  #       divio project deploy live
