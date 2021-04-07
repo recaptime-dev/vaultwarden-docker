@@ -1,66 +1,59 @@
-# [bitwardenrs_heroku](https://github.com/std2main/bitwardenrs_heroku)
-Run [bitwarden_rs](https://github.com/dani-garcia/bitwarden_rs) on heroku
+# BitwardenRS on Divio/Railway
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+Run [bitwarden_rs](https://github.com/dani-garcia/bitwarden_rs) on Divio.
+This may also work on Railway, too.
 
-Based on official bitwarden_rs docker image, added customized scripts to setup in heroku enviroment.
+Based on official bitwarden_rs docker image and also hard-forked
+from the original [bitwardenrs_heroku](https://github.com/std2main/bitwardenrs_heroku)
+repo, I added customized scripts to setup and manage in both
+Divio and Railway enviroments.
 
 ## Goal
 * Deploy a reliable bitwarden for free as easy as possible.
-  * Deploying: Almost no command line.
+  * Deploying: Requires basic command line skills. You'll be guided through the setup guide.
   * Maintainance: Almost zero. 
   * As more functions as budget support
-    1. Essentials and backups.
-    2. TODO: Realtime syncing cross multiple devices.
-    3. TODO: Attachments.
-    4. TODO: Icons.
+    1. Essentials and backups: In Divio, you jave up to 3 backups for 30 days. You can always manually backup if you want.
+    2. Icons: They'll always pulled on startup for new deploys. You can optionally disable it in the `bwrs-startup` file.
+    3. TODO: Realtime syncing cross multiple devices. This requires Nginx setup chaos.
+    4. TODO: Attachments. Since containers don't usually keep files once destoryed, we may consider doing some AWS S3 magic.
 
-## Why Heroku
-* Bitwarden_rs is a lightweight service that able to run on heroku's free dyno ( < 512MB ram).
-* Free quota (average 18 horus/day) lasts for one month when notification requests are blocked.
-* Verified user have extensible free addons to make life easy, including database, logging, backup, etc.
+## Setting up / Upgrading
+
+See the [installation guide][install-guide] on installing BitwardenRS on
+either Divio or Railway, as you choose.
+
+[install-guide]: SETUP.md
+
+## Why Divio/Railway
+
+* Bitwarden_rs is a lightweight service that able to run on
+Divio and Railway without even paying a penny.
 
 ## Features
-* For verified heroku users
-  * Postgresql Database for persistent storage.
-  * Daily backup and monthly longterm backup.
-  * Persistent rsa keys backed by config vars.
-* For unverified heroku users
-  * Please Try https://github.com/std2main/bitwardenrs_heroku/tree/git_store 
 
+### For Divio
 
-## Addons
-* Heroku-Postgresql
-  * Free tier provides 10000 rows that is enough for 10 people.
-  * My 5 year old vault contains 800 passwords and consumed 1000 rows in pgsql.
-* Autobus
-  * Daily backups of postgresql.
-  * Keep monthly backup for 1 year for free. [see more](https://devcenter.heroku.com/articles/autobus#backups-retention-limits)
-  * **Important**, add 'heroku@autobus.io' as collabrator in https://dashboard.heroku.com/apps/YOUR_APP/access after creation.
+* 1 GB of Postgres DB storage for free developer plan
+* 512 MB of RAM (when used over 200% aka 1 GB, things go brrr)
 
-## Limitation
-* No Attachments.
-* Admin Panel changes will be lost.
-* No Icons.
-  * [Official icon server](https://icons.bitwarden.net/) can be used if need icons, [see more](https://bitwarden.com/help/article/website-icons/). 
+### For Railway
 
-## TODO
-* Auto Update
-  * Github Action + Heroku, create a branch 'auto-update' to be used by heroku, this branch will periodically commit then triggers app rebuid in heroku to catch any updates of bitwarden_rs
-* Unverified heroku user solution
-  * Self owned DATABASE.
-  * Persistent local storage tricks.
+* Specs unknown yet, will update once pricing has been updated.
+  * But Railway should also fine too.
+
+## Limitations
+* No persistent storage on Divio and Railway (untested)
+  * No Attachments.
+  * Admin Panel changes will be lost on deploy.
 
 ## FAQ
-* Admin panel
-  * Set **ENABLE_ADMIN**=**true** in heroku enviroment.
-  * Use **GEN_ADMIN_TOKEN** as ADMIN_TOKEN. This is auto generated secret when app initialized.
+* Admin panel is disabled. Now what?
+  * Manual: Set the `ENABLE_ADMIN` into `true`, then use an password generator for the `ADMIN_TOKEN`.
+  * Automated: Run `./tools/enable-admin-panel [divio|railway]`
 * Configuration
-  * All enviroment of heroku will be treated as enviroment of bitwarden_rs.
-* Forcely loggout after a while
-  * Run heroku_set_rsa.sh to enable persistent rsa key.
-* App costs 24 dynos/day, aka it didn't sleep when idle.
-  * Mostly caused by requests of '/notifications' and '/icons', [see more](https://github.com/dani-garcia/bitwarden_rs/issues/126)
-  * Notifications are triggered every 4 minutes by chrome extension or desktop app.
-  * Icons are triggered if icon server url is not set to others.
-  * My method is to block them by Cloudflare firewall. 
+  * All environment variables will be treated as configuration of bitwarden_rs.
+  * When using Divio/Railway/other services that use containers, backup your changes on admin panel as the filesystem don't usually presist on containers.
+  because on every deploy, changes are loss.
+* I'm logged out after navigating away from the web vault. Hpw do I fix it?
+  * Run `tools/generate-rsakey [divio|railway]` to enable persistent RSA key on every website session.
