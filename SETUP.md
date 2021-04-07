@@ -52,6 +52,7 @@ Git remote:         git@git.divio.com:bitwardenrs-thepinsteam.git
    * This might take some while because the script is actively interacting with the API.
    * Once the provisioning of the Postgrrs database is completed, follow the prompts to complete the setup.
 10. Upon reaching this message below, run the `tools/push2divio` to push to its Git repository and deploy.
+
 ```
 ==========================================================
 The setup was completed successfully. To finish the
@@ -70,8 +71,13 @@ to issue an image rebuild:
 Enjoy your new BitwardenRS instance!
 ==========================================================
 ```
+
 11. Congrats! You successfully deployed an BitwardenRS instance
 on Divio.
 
 ## Installing on Railway
-TBD
+
+> **WORK IN PROGRESS**
+
+1. Fire up the deployment page by pressing the button below.
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new?template=https%3A%2F%2Fgithub.com%2FAndreiJirohHaliliDev2006%2Fbitwardenrs-on-divio&plugins=postgresql&envs=RAILWAY%2CDOMAIN%2CADMIN_TOKEN%2CENABLE_ADMIN%2CSMTP_FROM&optionalEnvs=DOMAIN%2CADMIN_TOKEN&RAILWAYDesc=Special+env+var+for+error+messages+and+logs&DOMAINDesc=If+using+custom+domain%2C+please+fill+it+with+the+https%3A%2F%2F+prefix.+%28e.g.+https%3A%2F%2Fvault.madebythepins.tk%29+Otherwise%2C+leave+it+blank&ADMIN_TOKENDesc=If+enabled%2C+enter+a+new%2C+uqinue+password.+Generate+with+%27openssl+rand+-base64+48%27+or+Bitwarden%27s+password+generator.&ENABLE_ADMINDesc=Set+to+true+to+enable%2C+otherwise+set+to+false.&RAILWAYDefault=true)
