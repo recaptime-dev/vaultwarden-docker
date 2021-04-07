@@ -24,11 +24,9 @@ jobs:
              echo "error: ensure that the secret specified is not blank."
              echo "error: By adding an new secret called ENABLE_GIT_SYNC, you agree that"
              echo "error: your '.github/workflows/divio-sync' file is edited on your needs."
-             echo
-             echo "==> Exiting gracefully..."
-             exit
+             exit 1
           else
-             echo "==> Passed! Continuing in 15 seconds..."
+             echo "✔ Passed! Continuing in 15 seconds..."
              sleep 15
           fi
       - uses: zent-contrib/sync-git-branch@v1
