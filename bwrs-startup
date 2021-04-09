@@ -1,13 +1,24 @@
 #!/bin/bash
+
+if [[ "${MAKE_IT_FAIL}" != "" ]] || [[ "${MAKE_IT_FAIL}" != "false" ]]; then
+   echo "error: MAKE_IT_FAIL is defined, aborting..."
+   echo "error: If you ready to check your environment variables for any configiration issues,"
+   echo "error: either set it to 'false' or just remove it entirely on your SaaS provider's"
+   echo "error: env vars settings page. Exiting..."
+fi
+
 # Let Rocket bind the PORT defined on our Dockerfile
 export ROCKET_PORT="${PORT}"
 
-# Do not use local storage
-# TODO: Store rsa_key in db or env
+# While its possible to write stuff in the
+# epherimal storage, we prefer to keep these
+# disabled.
 export ORG_ATTACHMENT_LIMIT=0
 export USER_ATTACHMENT_LIMIT=0
-#export DISABLE_ICON_DOWNLOAD=true
-export ICON_CACHzE_TTL=0
+# allow icons to be cached on our container
+export DISABLE_ICON_DOWNLOAD=false
+# Icon caches management
+export ICON_CACHE_TTL=120
 export ICON_CACHE_NEGTTL=0
 
 # do some checks if its Divio or Railway
