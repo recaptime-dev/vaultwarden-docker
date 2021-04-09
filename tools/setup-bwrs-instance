@@ -1,1 +1,30 @@
 #!/bin/bash
+
+if [[ "${1}" == "" ]]; then
+  echo "Available options: divio, railway"
+  exit
+fi
+
+railwayCliNotCompartible() {
+  echo "error: Railway CLI is not compartible with this machine, most noticeably the Termux app (and Android OS in general)"
+  echo "error: If you need to setup your BitwardenRS instance on Railway, please see the SETUP.md file, under the troubleshooting section."
+}
+
+if [[ "${1}" == "divio" ]]; then
+  CLI_PREFIX="divio project"
+  echo "info: Running this script for Divio..."
+elif [[ "${1}" == "railway" ]]; then
+  CLI_PREFIX="railway"
+  echo "info: Running this script for Railway..."
+else
+  echo "error: Unsupported option found."
+  exit 1
+fi
+
+# some checks on compartibility for the Railway CLI
+if echo $OSTYPE | grep -qE "linux-android*"; then
+  if [[ "${CLI_PREFIX}" == "railway" ]]; then
+  railwayCliNotCompartible
+  exit 2
+  fi
+fi
