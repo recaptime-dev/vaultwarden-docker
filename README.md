@@ -54,10 +54,14 @@ Divio and Railway without even paying a penny.
   * Admin Panel changes will be lost on deploy.
 
 ## FAQ
+* Can't receive the verification link into my inbox or mostly
+fall to spam/junk. Now what?
+  * Configure SMTP settings first. See `docs/smtp-setup.md` for details.
+  * Prefer not to self-host your own mail server? See [this section from the official BWRS docs](https://github.com/dani-garcia/bitwarden_rs/wiki/SMTP-configuration#smtp-servers) for options.
 * Admin panel is disabled. Now what?
   * Manual: Set the `ENABLE_ADMIN` into `true`, then use an password generator for the `ADMIN_TOKEN`.
   * Automated: Run `./tools/enable-admin-panel [divio|railway]`
-* Configuration
+* How do I configure my instance?
   * All environment variables will be treated as configuration of bitwarden_rs.
   * When using Divio/Railway/other services that use containers, backup your changes on admin panel as the filesystem don't usually presist on containers.
   because on every deploy, changes are loss.

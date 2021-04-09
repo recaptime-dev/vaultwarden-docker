@@ -62,9 +62,10 @@ run the following command to deploy to Divio:
   $ ./tools/push2divio
 
 This will force-push into your project's Git repository
-and then run `divio project deploy`. If required to update
-your BitwardenRS instance, run the following command
-to issue an image rebuild:
+and then run `divio project deploy`.
+
+If you ever need to update your BitwardenRS instance, run
+the following command to issue an image rebuild:
 
   $ ./tools/update-instance divio
 
@@ -80,4 +81,10 @@ on Divio.
 > **WORK IN PROGRESS**
 
 1. Fire up the deployment page by pressing the button below.
+
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new?template=https%3A%2F%2Fgithub.com%2FAndreiJirohHaliliDev2006%2Fbitwardenrs-on-divio&plugins=postgresql&envs=RAILWAY%2CDOMAIN%2CADMIN_TOKEN%2CENABLE_ADMIN%2CSMTP_FROM&optionalEnvs=DOMAIN%2CADMIN_TOKEN&RAILWAYDesc=Special+env+var+for+error+messages+and+logs&DOMAINDesc=If+using+custom+domain%2C+please+fill+it+with+the+https%3A%2F%2F+prefix.+%28e.g.+https%3A%2F%2Fvault.madebythepins.tk%29+Otherwise%2C+leave+it+blank&ADMIN_TOKENDesc=If+enabled%2C+enter+a+new%2C+uqinue+password.+Generate+with+%27openssl+rand+-base64+48%27+or+Bitwarden%27s+password+generator.&ENABLE_ADMINDesc=Set+to+true+to+enable%2C+otherwise+set+to+false.&RAILWAYDefault=true)
+
+2. Fill up the required missing fields. Don't forget to set
+`MAKE_IT_FAIL` to any value so the startup script will fail
+artifically instead of complaining about missing required
+configuration such as SMTP settings
