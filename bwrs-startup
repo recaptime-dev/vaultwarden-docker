@@ -1,11 +1,18 @@
 #!/bin/bash
 
-if [[ "${MAKE_IT_FAIL}" != "" ]] || [[ "${MAKE_IT_FAIL}" != "false" ]]; then
+if [[ "${MAKE_IT_FAIL}" == "true" ]]; then
    echo "error: MAKE_IT_FAIL is defined, aborting..."
    echo "error: If you ready to check your environment variables for any configiration issues,"
    echo "error: either set it to 'false' or just remove it entirely on your SaaS provider's"
    echo "error: env vars settings page. Exiting..."
+   exit
+elif [[ "${MAKE_IT_FAIL}" == "false" ]];
+    echo "==> Looks fine, starting up..."
+else
+    echo "==> MAKE_IT_FAIL var contains unsupported options, starting up..."
+    echo "    Only true or false are supported. Leaving it blank is also fine."
 fi
+sleep 2
 
 # Let Rocket bind the PORT defined on our Dockerfile
 export ROCKET_PORT="${PORT}"
