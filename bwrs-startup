@@ -6,7 +6,7 @@ if [[ "${MAKE_IT_FAIL}" == "true" ]]; then
    echo "error: either set it to 'false' or just remove it entirely on your SaaS provider's"
    echo "error: env vars settings page. Exiting..."
    exit
-elif [[ "${MAKE_IT_FAIL}" == "false" ]];
+elif [[ "${MAKE_IT_FAIL}" == "false" ]]; then
     echo "==> Looks fine, starting up..."
 else
     echo "==> MAKE_IT_FAIL var contains unsupported options, starting up..."
