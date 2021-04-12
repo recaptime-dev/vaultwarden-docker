@@ -1,5 +1,8 @@
 # Setting up on Divio/Railway
 
+The setup guide is currently in work-in-progress mode
+and may update without notice. Controbutions are welcome!
+
 ## Installing required dependencies
 
 * Optional dependency: (not required, but may suit your use case)
@@ -15,7 +18,7 @@
   * OpenSSL: `brew install openssl`
   * OpenSSH: `brew install openssh`
 * For Windows (assuming Windows 10, WSL users should follow Linix section above)
-  * Git:
+  * Git: (please use Git Bash as you follow the steps below as I'm working on Powershell script soon)
   * Python:
   * OpenSSL
   * OpenSSH
@@ -29,15 +32,22 @@ the `openssl-tool` APT package is also required) and OpenSSH installed on the ma
 
 1. [Fork the repo first](https://github.com/AndreiJirohHaliliDev2006/bitwardenrs-on-divio/fork).
    * If the official GitHub CLI is ibstalled, you can fork from the command line with `gh repo fork AndreiJirohHaliliDev2006/bitwardenrs-on-divio`.
+
 2. Clone your fork into your machine with `git clone https://github.com/YOUR-USERNAME/bitwardenrs-on-divio.git`.
-   * To also configure the upstream remote for official GH CLI users, do `gh repo clone YOUR-USERNAME/bitwardenrs-on-heroku`.
+   * To also configure the upstream remote for official GH CLI users, do `gh repo clone YOUR-USERNAME/bitwardenrs-on-divio`.
+
 3. Install the Divio CLI with `pip3 install -U divio-cli --upgrade`
    * For Windows users, replace `pip3` with `pip` if Python 3.x is only installed.
+
 4. Login to [Divio Control Panel](https://control.divio.com) then copy your API token in the [Access Token page](https://control.divio.com/account/desktop-app/access-token/).
    * To fetch/pull/push to and from the Git repo or access the server through SSH, you need to add your SSH key to your account. [Read this guide](https://support.divio.com/how-to/setup-ssh-key/) on how to add your SSH keys.
+
 5. [Create a new project](https://control.divio.com/control/project/create/). When prompted to choose an subscription, leave the defaults and hit Save.
+
 6. Go back to your terminal window and do `divio login [PASTE-YOUR-ACCESS-KEY-HERE]`
+
 7. Navigate into your local copy of your fork with `cd bitwardenrs-on-divio` (may depends on how you clone and where).
+
 8. Run `divio project configure`, press `y` then hit Enter. Then type your new project's slug and hit Enter.
 You may notice some text simliar to these below after hitting Enter.
 Now, copy your Git remote and run `git remote add divio [YOUR-DIVIO-GIT-REMOTE-HERE]`.
@@ -47,10 +57,12 @@ Please enter the application slug of the local project: bitwardenrs-thepinsteam
 Configuration file: /data/data/com.termux/files/home/bitwardenrs_heroku/.divio/config.json
 Git remote:         git@git.divio.com:bitwardenrs-thepinsteam.git
 ```
+
 9. Run the `tools/setup-bwrs-instance` script with `divio` argument.
    * You may prompted to re-enter your Divio API key because it doesn't rely on the `~/.netrc` file on your drive for security reasons.
    * This might take some while because the script is actively interacting with the API.
    * Once the provisioning of the Postgrrs database is completed, follow the prompts to complete the setup.
+
 10. Upon reaching this message below, run the `tools/push2divio` to push to its Git repository and deploy.
 
 ```
@@ -87,4 +99,20 @@ on Divio.
 2. Fill up the required missing fields. Don't forget to set
 `MAKE_IT_FAIL` to any value so the startup script will fail
 artifically instead of complaining about missing required
-configuration such as SMTP settings
+configuration such as SMTP settings and domain name on your
+runtime logs.
+
+3. Open your terminal and clone your hard-forked repo with `gh repo clone YOUR-USERNAME/bitwardenrs-on-divio`
+(if GitHub CLI is not installed try `git clone git@github.com:YOUR-USERNAME/bitwardenrs-on-divio.git`.
+
+4. Navigate into your local copy of your fork with `cd bitwardenrs-on-divio` (may depends on how you clone and where).
+
+5. Run `./tools/setup-bwrs-instance railway` to install the CLI and connect your local repo to the newly-created project,
+among other things.
+   * The script will set `MAKE_IT_FAIL` to `false` after completing the setup wizard.
+
+## Troubleshooting
+
+* Can't install Railway CLI on Termux?
+  * Railway CLI is currently only work on Linux, macOS and Windows. Probably try following the setup
+guide on an cloud dev environment like Gitpod.
