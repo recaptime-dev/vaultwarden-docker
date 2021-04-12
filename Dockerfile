@@ -1,7 +1,8 @@
-##################  RUNTIM IMAGE  ###################
+##################  RUNTIME IMAGE  ###################
 # Create from wellbuilt bitwardenrs
-# Modify start.sh to suit in heroku enviroment
-from bitwardenrs/server:alpine
+# Modify bwrs-startup to suit in your PaaS service
+# you are using to deploy this
+FROM bitwardenrs/server:alpine
 
 COPY bwrs-startup /usr/bin/bwrs-startup
 
