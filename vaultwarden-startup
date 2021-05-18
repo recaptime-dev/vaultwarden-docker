@@ -70,8 +70,7 @@ sleep 3
 # Do some checks if the database is there
 if [[ "${DATABASE_URL}" == "" ]]; then
   echo "error: DATABASE_URL is undefined, thus the server will not start."
-  echo "error: To continue, add an Postgres service/plugin in your Divio/Railway app."
-  echo "error: See https://rtapp.tk/bwrs-add-postgres-db for details."
+  echo "error: To continue, add an DATABASE_URL secret on your PaaS service."
   exit 1
 fi
 

@@ -2,15 +2,16 @@
 # Create from wellbuilt bitwardenrs
 # Modify bwrs-startup to suit in your PaaS service
 # you are using to deploy this
-FROM bitwardenrs/server:alpine
+FROM vaultwarden/server:alpine
 
-COPY bwrs-startup /usr/bin/bwrs-startup
+COPY vaultwarden-startup /usr/bin/vaultwarden-startup
 
 ENV PORT 3000
 EXPOSE 3000
 
 ## because bwrs-startup requires bash, so we install that
-RUN apk add bash
+RUN apk add bash coreutils \
+    && ln -s /usr/bin/vaultwarden-startup bwrs-startup
 
 WORKDIR /
 ENTRYPOINT ["usr/bin/dumb-init", "--"]
