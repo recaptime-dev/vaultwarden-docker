@@ -49,7 +49,7 @@ through the admin panel will be lost on deploy.
 ## FAQ
 * Can't receive the verification link into my inbox or mostly
 fall to spam/junk. Now what?
-  * Configure SMTP settings first. See [this docs page] for details.
+  * Configure SMTP settings first. See [this docs page](https://github.com/dani-garcia/vaultwarden/wiki/SMTP-configuration) for details.
   * Prefer not to self-host your own mail server? See [this section from the  docs](https://github.com/dani-garcia/vaultwarden/wiki/SMTP-configuration#smtp-servers) for options.
 * Admin panel is disabled. Now what?
   * Manual: Set the `ENABLE_ADMIN` into `true`, then use an password generator for the `ADMIN_TOKEN`.
