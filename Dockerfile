@@ -11,7 +11,7 @@ EXPOSE 3000
 
 ## because bwrs-startup requires bash, so we install that
 RUN apk add bash coreutils \
-    && ln -s /usr/bin/vaultwarden-startup bwrs-startup
+    && ln -s /usr/bin/vaultwarden-startup /usr/bin/bwrs-startup
 
 WORKDIR /
 ENTRYPOINT ["usr/bin/dumb-init", "--"]
