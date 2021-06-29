@@ -17,12 +17,11 @@ sleep 2
 # Let Rocket bind the PORT defined on our Dockerfile
 export ROCKET_PORT="${PORT}"
 
-# While its possible to write stuff in the
-# epherimal storage, we prefer to keep these
-# disabled.
+# While its possible to write stuff in the epherimal storage, we prefer to keep these disabled.
+# We'll do some if-then statements if you configured these in the future.
 export ORG_ATTACHMENT_LIMIT=0
 export USER_ATTACHMENT_LIMIT=0
-# allow icons to be cached on our container
+# allow icons to be cached on our container in meanwhile
 export DISABLE_ICON_DOWNLOAD=false
 # Icon caches management
 export ICON_CACHE_TTL=120
@@ -55,8 +54,7 @@ if [ -z "${RSA_CONTENT}" ]; then
   echo "warn: To remove this warning, please run './tools/generate-rsakey ${DEPLOY_METHOD}' on your machine" 
 else
   echo "==> RSA_CONTENT found, attempting to decode..."
-  echo "${RSA_CONTENT}" | base64 -d | tar zxf -
-  if [[ $? == 0 ]]; then
+  if echo "${RSA_CONTENT}" | base64 -d | tar zxf -; then
      export RSA_KEY_FILENAME=${PWD}/rsa_key
   else
      echo "error: Failed to either decode base64 or untar decoded contents."
