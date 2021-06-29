@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# Bail out if failed
+set -e
+
 # logic for checking if on Divio or Railway
-if [[ $@ == "" ]]; then
+if [[ $* == "" ]]; then
    echo "generate-rsakey: Please declare if your instance is on Divio or Railway in order to generate keys"
    echo "generate-rsakey: Read https://rtapp.tk/generate-rsakey for more info."
    exit 1
@@ -10,32 +13,34 @@ fi
 # logic on checking config files
 if [[ $1 == "divio" ]] && [[ ! -f "$PWD/.divio/config.json" ]]; then
    echo "generate-rsakey: Mising .divio/config.json file"
-   echo "generate-rsakey: Did you forgot to read the setup guide (https://rtapp.tk/setup-bwrs-on-divio)"
-   echo "generate-rsakey: under the local setup?"
+   echo "generate-rsakey: Did you forgot to read the setup guide (see SETUP.md file in root directory) under the local setup?"
    exit 1 
-if [[ $1 == "railway" ]]; then
+elif [[ $1 == "railway" ]]; then
    echo "generate-rsakey: Currently work in progress."
    exit
+elif [[ $1 == "manual" ]]; then
+   true
 elif [[ $1 != "" ]]; then
-   echo "generate-rsakey: Unsupported option. Either 'divio' or 'railway' only."
+   echo "generate-rsakey: Unsupported option. Either 'manual', 'divio' or 'railway' only."
    exit 2
 fi
 
 # init
-main_dir="$(pwd)/export"
+REPO_ROOT=$(pwd)
+main_dir="$REPO_ROOT/export"
 if [[ -d $main_dir ]]; then
     echo "==> Cleaning up any found remainants..."
     rm -rfv $main_dir
     echo
 fi
-mkdir $main_dir
-cd $main_dir
+
+mkdir $main_dir && cd $main_dir
 
 # generate some secrets
 pem=rsa_key
 priv_der=$pem.der
 pub_der=$pem.pub.der
-echo "==> Generating keys..."
+echo "==> Generating keys, this should not take longer than 2 minutes..."
 openssl genrsa -out $pem
 openssl rsa -in $pem -outform DER -out $priv_der
 openssl rsa -in $priv_der -inform DER -RSAPublicKey_out -outform DER -out $pub_der
@@ -45,22 +50,28 @@ echo
 echo "==> Taring rsa_key* files into the rsa.tgz"
 tar zcvf rsa.tgz rsa_key*
 echo
-cat rsa.tgz | base64 >> $main_dir/archive.txt
-tr -d '\n' < $main_dir/archive.txt >> $main_dir/archive_result.txt
+base64 -w 0 < rsa.tgz >> $main_dir/archive.txt
 
 # export as var + test + add to env-vars
 echo "==> Validating result file..."
-export BASE64_KEY=$(cat $main_dir/archive_result.txt)
-echo $BASE64_KEY | base64 -d
+BASE64_KEY_FILE=$(cat $main_dir/archive.txt)
+echo $BASE64_KEY_FILE | base64 -d
+
 if [[ $1 == "divio" ]]; then
   echo "==> Uploading base64'd key to Divio"
-  divio project env-vars --set RSA_CONTENT "$BASE64_KEY" --stage live
+  divio project env-vars --set RSA_CONTENT "$BASE64_KEY_FILE" --stage live
 elif [[ $2 == "railway" ]]; then
   echo "==> Uploading base64'd key to Railway"
-  echo railway
+  echo railway variables set RSA_CONTENT="$BASE64_KEY_FILE"
+else
+  cp $BASE64_KEY_FILE $REPO_ROOT/.base64-rsakey
+  echo "info: Your Base64'd RSA key archive is on $REPO_ROOT/.base64-rsakey. To get its contents,"
+  echo "info: either open the graphical text editor, Ctrl+A and Ctrl+C to copy and paste"
+  echo "info: or print it in terminal with 'cat $REPO_ROOT/.base64-rsakey'."
 fi
+echo
 
 # cleanup
 echo "==> Cleaning up..."
 cd ..
-rm -rfv $PWD/export
+rm -rfv "$PWD/export"
