@@ -1,0 +1,37 @@
+{$DOMAIN}:443 {
+  log {
+    level INFO
+    output file {$LOG_FILE} {
+      roll_size 10MB
+      roll_keep 10
+    }
+  }
+
+  # TLS stuff
+  tls {
+    # Uncomment Duck DNS stuff if you gonna use Duck DNS.
+    #dns duckdns {$DUCKDNS_TOKEN}
+    # Otherwise, uncomment Cloudflare stuff
+    #dns cloudflare {$CLOUDFLARE_API_TOKEN}
+  }
+  reverse_proxy localhost:8080
+  reverse_proxy /notifications/hub localhost:3012
+
+  # Use the ACME HTTP-01 challenge to get a cert for the configured domain.
+  # Uncomment if you manage your DNS manually instead.
+  #tls {$EMAIL}
+
+  # This setting may have compatibility issues with some browsers
+  # (e.g., attachment downloading on Firefox). Try disabling this
+  # if you encounter issues.
+  encode gzip
+
+  # Notifications redirected to the WebSocket server
+  reverse_proxy /notifications/hub vaultwarden:3012
+
+  # Proxy everything else to Rocket
+  reverse_proxy vaultwarden:80 {
+       # Send the true remote IP to Rocket, so that vaultwarden can put this in the
+       # log, so that fail2ban can ban the correct IP.
+       header_up X-Real-IP {remote_host}
+}
