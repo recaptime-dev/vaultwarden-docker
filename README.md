@@ -16,6 +16,7 @@ repo, I added customized scripts to setup and manage in both Divio and Railway e
   2. Icons: They'll always pulled on startup for new deploys. You can optionally disable it in the `vaultwarden-startup` file.
   3. TODO: Realtime syncing cross multiple devices. This requires Nginx setup chaos.
   4. TODO: Attachments. Since containers don't usually keep files once destoryed, we may consider doing some AWS S3 magic soon. (Speaking of setting this up on an Kubernetes-centric PaaS services like Okteto Cloud, we'll working on to add one soon.)
+* And to test-run Vaultwarden, an Docker Compose file is being 
 
 ## Setting up / Upgrading
 
