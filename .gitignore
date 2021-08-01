@@ -2,3 +2,4 @@
 *.env
 .divio/
 export/
+data/**
