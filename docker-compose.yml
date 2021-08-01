@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped # change this to always if needed, but please use f**king Kubernetes instead.
+    environment:
+      - WEBSOCKET_ENABLED=true # Enable WebSocket notifications on local deployments. Proxying stuff in Railway is gonna be bloddy hell.
+    volumes:
+      - ./data/vaultwarden-appdata:/data
+
+  caddy:
+    image: ghcr.io/ajhalili2006/
+    build: solutions/
+    container_name: caddy
+    restart: unless-stopped # change this to always if needed, but please use f**king Kubernetes instead.
+    ports:
+      - 80:80  # Needed for the ACME HTTP-01 challenge.
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/caddy-config:/config
+      - ./data/caddy-data:/data
+    environment:
+      - LOG_FILE=/data/access.log
+    env_file: caddy.env
