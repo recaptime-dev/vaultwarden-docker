@@ -1,0 +1,62 @@
+#!/bin/bash
+#shellcheck disable=SC2034
+
+# https://github.com/ajhalili2006/dotfiles/blob/main/bootstrap#L17-L47
+useColor() {
+  RED=$(printf '\033[31m')
+  GREEN=$(printf '\033[32m')
+  YELLOW=$(printf '\033[33m')
+  BLUE=$(printf '\033[34m')
+  MAGENTA=$(printf '\033[35m')
+  BOLD=$(printf '\033[1m')
+  RESET=$(printf '\033[m')
+}
+echoStageName() {
+    echo "${BOLD}----> $* ${RESET}"
+}
+echoStageNameAdd() {
+    echo "${BOLD}      $* ${RESET}"
+}
+warn() {
+    echo "${YELLOW}warning: $* ${RESET}"
+}
+error() {
+    # this will be long, so I must do "&& exit 1" manually
+    echo "${RED}error: $* ${RESET}"
+}
+success() {
+    echo "${GREEN}success: $* ${RESET}"
+}
+
+main() {
+    if [[ $1 == "build" ]]; then
+        docker build --file Dockerfile --tag ghcr.io/ajhalili2006/vaultwarden-paas-starter:localdev .
+    elif [[ $1 == "start" ]]; then
+    if [[ $2 == "compose" ]]; then
+        docker-compose up --build -d
+    else
+        echo "Supported options: compose, docker"
+        echo
+    fi
+    elif [[ $1 == "stop" ]]; then
+    if [[ $2 == "compose" ]]; then
+        docker-compose stop
+    else
+        echo "Supported options: compose, docker"
+        echo
+    fi
+    elif [[ $1 == "destory" ]]; then
+    if [[ $2 == "compose" ]]; then
+        docker-compose down --timeout 15
+    else
+        echo "Supported options: compose, docker"
+        echo
+    fi
+    else
+        error "Command '$1' not understood by the bash script. Supported commands are start, build, export-data, import-data, and convert-db"
+        error "See '$0 help' for full list of available commands."
+        exit 2
+    fi
+}
+
+main "$@"
