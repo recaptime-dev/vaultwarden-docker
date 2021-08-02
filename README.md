@@ -16,12 +16,13 @@ repo, I added customized scripts to setup and manage in both Divio and Railway e
   2. Icons: They'll always pulled on startup for new deploys. You can optionally disable it in the `vaultwarden-startup` file.
   3. TODO: Realtime syncing cross multiple devices. This requires Nginx setup chaos.
   4. TODO: Attachments. Since containers don't usually keep files once destoryed, we may consider doing some AWS S3 magic soon. (Speaking of setting this up on an Kubernetes-centric PaaS services like Okteto Cloud, we'll working on to add one soon.)
-* And to test-run Vaultwarden, an Docker Compose file is being 
+* And to test-run Vaultwarden, an Docker Compose file is being developing for that btw.
 
 ## Setting up / Upgrading
 
 See the [installation guide][install-guide] on installing BitwardenRS on either Divio or Railway, as you choose.
 
+<!-- TODO: Point to the docs site soon! -->
 [install-guide]: SETUP.md
 
 Ypu can even follow the setup guide in an cloud environment like Gitpod. Just hit the button below, and you can fire up the terminal and follow along without ever needing to install anything in your local machine
@@ -50,4 +51,4 @@ fall to spam/junk. Now what?
   * When using Divio/Railway/other services that use containers, backup your changes on admin panel as the filesystem don't usually presist on containers.
   because on every deploy, changes are loss.
 * I'm logged out after navigating away from the web vault. Hpw do I fix it?
-  * Run `tools/generate-rsakey <paas-platform-slug>` to enable persistent RSA key on every website session.
+  * Run `./tools/generate-rsakey <paas-platform-slug>` to enable persistent RSA key on every website session.
