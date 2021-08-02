@@ -15,4 +15,4 @@ RUN apk add bash coreutils \
 
 WORKDIR /
 ENTRYPOINT ["usr/bin/dumb-init", "--"]
-CMD ["/usr/bin/bwrs-startup"]
+CMD ["/usr/bin/vaultwarden-startup"]
