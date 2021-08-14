@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "ci/github-actions"
+      - "dependencies"
+      - "Updated by Dependabot" # needed to automagically approve and merge
+    reviewers:
+      # if using your own robot account, change this into your
+      # service account's GitHub username
+      - "RecapTimeBot"
+  # Also our Dockerfiles should be up-to-date too
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "packages/docker-base-images"
+      - "dependencies"
+      - "Updated by Dependabot" # needed to automagically approve and merge
+    reviewers:
+      # if using your own robot account, change this into your
+      # service account's GitHub username
+      - "RecapTimeBot"
