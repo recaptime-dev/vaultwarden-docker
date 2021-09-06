@@ -15,7 +15,7 @@ fi
 sleep 2
 
 # Let Rocket bind the PORT defined on our Dockerfile
-export ROCKET_PORT="${PORT}"
+export ROCKET_PORT="${PORT:-"8080"}"
 
 # While its possible to write stuff in the epherimal storage, we prefer to keep these disabled.
 # We'll do some if-then statements if you configured these in the future.
@@ -27,11 +27,13 @@ export DISABLE_ICON_DOWNLOAD=false
 export ICON_CACHE_TTL=120
 export ICON_CACHE_NEGTTL=0
 
-# do some checks if its Divio or Railway
-if [[ "${RAILWAY}" == "false" ]] || [[ "${RAILWAY}" == "" ]]; then
-   DEPLOY_METHOD=divio
-else
-   DEPLOY_METHOD=railway
+# Checks for different providers to provide customized error messages and some fixes.
+if [[ -n "$RAILWAY_STATIC_URL" ]]; then
+  export DEPLOY_METHOD="railway"
+  export IP_HEADER=X-Forwarded-For
+elif [[ -n "$SSO_DSN" ]] || [[ -n "$DOMAIN_ALIASES" ]]; then
+  export DEPLOY_METHOD="divio"
+  export IP_HEADER=X-Forwarded-For
 fi
 
 if [[ "${ENABLE_ADMIN}" == "true" ]]; then
@@ -66,9 +68,9 @@ echo
 sleep 3
 
 # Do some checks if the database is there
-if [[ "${DATABASE_URL}" == "" ]]; then
-  echo "error: DATABASE_URL is undefined, thus the server will not start."
-  echo "error: To continue, add an DATABASE_URL secret on your PaaS service."
+if [[ -z "${DATABASE_URL}" ]]; then
+  echo "error: DATABASE_URL is undefined, thus the server will not start. To continue, add an DATABASE_URL secret on your PaaS service."
+  echo "error: If you're running locally,  ease setup an Postgres instance"
   exit 1
 fi
 
