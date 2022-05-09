@@ -58,7 +58,7 @@ jobs:
 
       # Then set up QEMU and Buildx so the Build and push action below will not trigger errors
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         
