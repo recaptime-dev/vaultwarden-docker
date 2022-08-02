@@ -1,18 +1,18 @@
 ##################  RUNTIME IMAGE  ###################
 # Create using wellbuilt vaultwarden Docker image as the base image
-# Modify vaultwarden-startup to suit in your PaaS service you are using to deploy this
+# Modify scripts/vaultwarden-startup to suit in your PaaS service you are building
+# this image from source.
 FROM vaultwarden/server:alpine
 
-COPY vaultwarden-startup /usr/bin/vaultwarden-startup
+COPY scripts/ /usr/local/bin/
 
-ENV PORT 3000
+ENV PORT=3000 TZ=UTC
 EXPOSE 3000
 
-## because vaultwarden-startup requires bash, so we install that
-RUN apk add bash coreutils \
-    # Just in case we're still calling the old stuff
-    && ln -s /usr/bin/vaultwarden-startup /usr/bin/bwrs-startup
+RUN apk add --no-cache \
+    # Because the entrypoint script and the backup script itself need rclone and bash,
+    # we'll install them through apk
+    heirloom-mailx p7zip sqlite supercronic tzdata bash coreutils rclone
 
 WORKDIR /
-ENTRYPOINT ["usr/bin/dumb-init", "--"]
-CMD ["/usr/bin/vaultwarden-startup"]
+ENTRYPOINT ["/usr/local/bin/image-entrypoint"]
