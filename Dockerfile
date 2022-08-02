@@ -12,7 +12,8 @@ EXPOSE 3000
 RUN apk add --no-cache \
     # Because the entrypoint script and the backup script itself need rclone and bash,
     # we'll install them through apk
-    heirloom-mailx p7zip sqlite supercronic tzdata bash coreutils rclone
+    heirloom-mailx p7zip sqlite supercronic tzdata bash coreutils rclone npm \
+  && npm i -g concurrently
 
 WORKDIR /
 ENTRYPOINT ["/usr/local/bin/image-entrypoint"]
