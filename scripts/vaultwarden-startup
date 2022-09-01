@@ -1,0 +1,128 @@
+#!/usr/bin/dumb-init /bin/bash
+#shellcheck shell=bash
+
+# sources the backup integration's base file where it includes necessary
+# shell functions and 
+source /usr/local/bin/backup-integration-stdlib.sh
+
+if [[ $TZ != "UTC" ]]; then
+  TIMEZONE=$TZ
+else
+  TIMEZONE="UTC"
+fi
+
+if [[ "${MAKE_IT_FAIL}" != "" ]]; then
+   echo "error: MAKE_IT_FAIL variable is defined, aborting startup..."
+   echo "error: If you ready to check your environment variables for any configiration issues,"
+   echo "error: either set it to 'false' or just remove it entirely on your SaaS provider's"
+   echo "error: env vars settings page. Exiting..."
+   exit 2
+elif [[ "${MAKE_IT_FAIL}" == "" ]]; then
+    echo "==> Configuration seems to be fine, proceeding..."
+fi
+sleep 2
+
+# Let Rocket bind the PORT defined on our Dockerfile
+export ROCKET_PORT="${PORT:-"8080"}"
+
+if [[ ${FF_RCLONE_BACKUP} == "" ]] && [[ ${RCLONE_CONFIG} == "" ]]; then 
+  export ORG_ATTACHMENT_LIMIT=0 USER_ATTACHMENT_LIMIT=0
+elif [[ ${FF_RCLONE_BACKUP} == "true" ]] && [[ ${RCLONE_CONFIG} != "" ]]; then
+  echo "info: attempting to restore rclone config from base64-encoded form..."
+  if ! echo "${RECLONE_CONFIG}" | base64 -d > /root/.config/rclone/rclone.config; then
+    echo "warning: base64 decode failed, disabling feature flag..."
+    export FF_RCLONE_BACKUP=false
+  fi
+  export ORG_ATTACHMENT_LIMIT=${ORG_ATTACHMENT_LIMIT:-"1024000"} USER_ATTACHMENT_LIMIT=${USER_ATTACHMENT_LIMIT:-"1024000"}
+fi
+
+# allow icons to be cached on our container in meanwhile
+export DISABLE_ICON_DOWNLOAD=false
+# Icon caches management
+export ICON_CACHE_TTL=120
+export ICON_CACHE_NEGTTL=0
+
+# Checks for different providers to provide customized error messages and some fixes,
+# especially for IP addresses.
+if [[ -n "$RAILWAY_STATIC_URL" ]]; then
+  export DEPLOY_METHOD="railway"
+  export IP_HEADER=X-Forwarded-For
+elif [[ -n "$SSO_DSN" ]] || [[ -n "$DOMAIN_ALIASES" ]]; then
+  export DEPLOY_METHOD="divio"
+  export IP_HEADER=X-Forwarded-For
+fi
+
+if [[ "${ENABLE_ADMIN}" == "true" ]]; then
+  echo "==> Enabling admin dashboard..."
+  if [[ "${ADMIN_TOKEN}" == "" ]]; then
+    echo "warn: No token found for the admin dashboard, generating one"
+    export ADMIN_TOKEN=$(openssl rand -hex 24)
+    echo "warn: Generated token is $ADMIN_TOKEN, this will be reset on restart unless set."
+  fi
+else
+  echo "==> Admin panel is disabled, attempting to remove ADMIN_TOKEN..."
+  unset ADMIN_TOKEN
+fi
+echo
+sleep 3
+
+echo "==> Checking for RSA_CONTENT..."
+sleep 3
+if [ -z "${RSA_CONTENT}" ]; then
+  echo "warn: RSA_CONTENT is missing, so you'll be logged out after leaving the web vault page."
+  echo "warn: To remove this warning, please run './tools/generate-rsakey ${DEPLOY_METHOD}' on your machine" 
+elif [[ ${FF_RCLONE_BACKUP} != "true" ]]; then
+  echo "==> RSA_CONTENT found, attempting to decode..."
+  if echo "${RSA_CONTENT}" | base64 -d | tar zxf -; then
+     export RSA_KEY_FILENAME=${PWD}/rsa_key
+  else
+     echo "error: Failed to either decode base64 or untar decoded contents."
+     echo "error: Run './tools/generate-rsakey ${DEPLOY_METHOD}' on your manchine"
+     exit 1
+  fi
+else
+  echo "info: skipped due to backups enabled"
+fi
+echo
+sleep 3
+
+# Do some checks if the database is there
+if [[ -z "${DATABASE_URL}" ]] && [[ ${FF_RCLONE_BACKUP} != "true" ]]; then
+  echo "error: DATABASE_URL is undefined, thus the server will not start. To continue, add an DATABASE_URL secret on your PaaS service."
+  echo "error: If you're running locally, pease either setup an Postgres DB or presistence through rclone"
+  exit 1
+fi
+
+function configure_timezone() {
+    ln -sf "/usr/share/zoneinfo/${TIMEZONE}" "${LOCALTIME_FILE}"
+}
+
+function configure_cron() {
+    local FIND_CRON_COUNT="$(grep -c 'backup.sh' "${CRON_CONFIG_FILE}" 2> /dev/null)"
+    if [[ "${FIND_CRON_COUNT}" -eq 0 ]]; then
+        echo "${CRON} bash /app/backup.sh" >> "${CRON_CONFIG_FILE}"
+    fi
+}
+
+function setup_remote_access() {
+  ssh-keygen -A
+  /usr/sbin/sshd
+  if [[ $FF_TAILSCALE == "true" ]]; then
+    /app/tailscaled --tun=userspace-networking --socks5-server=localhost:1055 &
+    tailscale up --authkey "${TAILSCALE_AUTHKEY}" --hostname="$TAILSCALE_HOSTNAME"
+  fi
+}
+
+if [[ "${FF_RCLONE_BACKUP}" == "true" ]]; then
+  init_env
+  check_rclone_connection
+  configure_timezone
+  configure_cron
+fi
+
+echo "==> Checks done, starting up..."
+if [[ $FF_RCLONE_BACKUP == "true" ]]; then
+  concurrently --prefix "[{name} {pid}]" --kill-others "/start.sh" "supercronic -passthrough-logs -quiet \"${CRON_CONFIG_FILE}\""
+else
+  bash /start.sh
+fi
