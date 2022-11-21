@@ -5,7 +5,7 @@ on:
   #schedule:
   #  - cron: '30 3 * * *'
   push:
-    branches: [ main ]
+    branches: [ main, 'ajhalili2006/**' ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
     # TODO: use paths-filter action later
@@ -25,6 +25,7 @@ env:
 
 jobs:
   docker-build:
+    name: Build and push
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -77,6 +78,10 @@ jobs:
             quay.io/${{ env.RHQCR_NAMESPACE }}
           labels: |
             org.opencontainers.image.vendor=Andrei Jiroh Halili
+          tags: |
+            type=ref,prefix=branch-,event=branch
+            type=sha,format=long,prefix=commit-
+            type=raw,value=latest,enable={{is_default_branch}}
 
       # Then set up QEMU and Buildx so the Build and push action below will not trigger errors
       - name: Set up QEMU

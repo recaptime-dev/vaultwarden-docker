@@ -14,13 +14,13 @@ export ROCKET_PORT="${PORT:-"8080"}"
 
 # While its possible to write stuff in the epherimal storage, we prefer to keep these disabled.
 # We'll do some if-then statements if you configured these in the future.
-export ORG_ATTACHMENT_LIMIT=0
-export USER_ATTACHMENT_LIMIT=0
+export ORG_ATTACHMENT_LIMIT=${ORG_ATTACHMENT_LIMIT:-"0"}
+export USER_ATTACHMENT_LIMIT=${USER_ATTACHMENT_LIMIT:-"0"}
 # allow icons to be cached on our container in meanwhile
 export DISABLE_ICON_DOWNLOAD=false
 # Icon caches management
-export ICON_CACHE_TTL=120
-export ICON_CACHE_NEGTTL=0
+export ICON_CACHE_TTL=${ICON_CACHE_TTL:-"120"}
+export ICON_CACHE_NEGTTL=${ICON_CACHE_NEGTTL:-"0"}
 
 if [[ $CF_PROXY == true ]]; then
   export IP_HEADER=CF-Connecting-IP
@@ -38,8 +38,6 @@ else
   echo "==> Admin panel is disabled, removing ADMIN_TOKEN..."
   unset ADMIN_TOKEN
 fi
-echo
-sleep 3
 
 echo "==> Checking for RSA_CONTENT..."
 sleep 3
@@ -47,7 +45,7 @@ if [ -z "${RSA_CONTENT}" ]; then
   echo "warn: RSA_CONTENT is missing, so you'll be logged out after leaving the web vault page."
   echo "warn: To remove this warning, please run './tools/generate-rsakey ${DEPLOY_METHOD}' on your machine" 
 else
-  echo "==> RSA_CONTENT found, attempting to decode..."
+  echo "info: RSA_CONTENT found, attempting to decode..."
   if echo "${RSA_CONTENT}" | base64 -d | tar zxf -; then
      export RSA_KEY_FILENAME=${PWD}/rsa_key
   else
@@ -56,8 +54,6 @@ else
      exit 1
   fi
 fi
-echo
-sleep 3
 
 # Do some checks if the database is there
 if [[ -z "${DATABASE_URL}" ]]; then
