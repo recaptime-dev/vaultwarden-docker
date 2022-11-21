@@ -15,9 +15,10 @@ on:
       - ".github/workflows/docker-ci.yml"
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 env:
-  RHQCR_NAMESPACE: recaptime-dev/vaultwarden-docker
+  RHQCR_NAMESPACE: recaptime-dev/vaultwarden
   GITLAB_MAUDEV_NAMESPACE: recaptime/infra/docker/vaultwarden
   GHCR_NAMESPACE: recaptime/vaultwarden-docker
   DOCKERHUB_NAMESPACE: Ajhalilidev06ph # TODO: Update this before I add Docker Hub login stuff.
