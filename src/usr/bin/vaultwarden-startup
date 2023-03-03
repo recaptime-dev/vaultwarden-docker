@@ -57,14 +57,15 @@ fi
 
 # Do some checks if the database is there
 if [[ -z "${DATABASE_URL}" ]]; then
-  echo "error: DATABASE_URL is undefined, thus the server will not start. To continue, add an DATABASE_URL secret on your PaaS service."
-  echo "error: If you're running locally,  ease setup an Postgres instance"
+  echo "error: DATABASE_URL is undefined, thus the server will not start. To continue, add an DATABASE_URL"
+  echo "error: secret on your PaaS service. If you're running locally, please setup an Postgres instance in"
+  echo "error: your Docker Compose config."
   exit 1
 fi
 
 if [[ "${I_REALLY_WANT_VOLATILE_STORAGE}" == "true" ]]; then
   true
-elif [[ "${I_REALLY_WANT_VOLATILE_STORAGE}" != "true" ]] && [[ "${SAFETY_LOCK_DATADIR}" == "$(cat /etc/safety-lock/datadir/code.txt)" ]]; then
+elif [[ "${I_REALLY_WANT_VOLATILE_STORAGE}" != "true" ]] && [[ "${SAFETY_LOCK_CODE}" == "$(cat /etc/safety-lock/datadir/code.txt)" ]]; then
   echo "error: To avoid data loss, either setup an container volume for the data directory or"
   echo "error: set I_REALLY_WANT_VOLATILE_STORAGE to true, assuming you know what you're doing."
   exit 1

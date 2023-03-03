@@ -8,13 +8,13 @@ services:
     restart: unless-stopped # change this to always if needed, but please use f**king Kubernetes instead.
     environment:
       - WEBSOCKET_ENABLED=true # Enable WebSocket notifications on local deployments. Proxying stuff in Railway is gonna be bloddy hell.
+      - LOG_FILE=/data/access.log
     volumes:
       - ./data/vaultwarden-appdata:/data # Vaultvarden data
       - ./Caddyfile:/etc/caddy/Caddyfile:ro # Caddyfile
       - ./data/caddy-config:/config # caddy config
       - ./data/caddy-data:/data # caddy data
-    environment:
-      - LOG_FILE=/data/access.log
+    # adjust ports if you're not doing the Caddy setup or for some reasons
     ports:
       - 80:80  # Needed for the ACME HTTP-01 challenge.
       - 443:443

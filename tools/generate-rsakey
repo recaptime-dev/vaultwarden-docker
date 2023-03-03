@@ -6,7 +6,7 @@ set -e
 # logic for checking if on Divio or Railway
 if [[ $* == "" ]]; then
    echo "generate-rsakey: Please declare if your instance is on Divio or Railway in order to generate keys"
-   echo "generate-rsakey: Read https://rtapp.tk/generate-rsakey for more info."
+   echo "generate-rsakey: Read https://go.recaptime.eu.org/generate-rsakey for more info."
    exit 1
 fi
 
@@ -18,7 +18,7 @@ if [[ $1 == "divio" ]] && [[ ! -f "$PWD/.divio/config.json" ]]; then
 elif [[ $1 == "railway" ]]; then
    echo "generate-rsakey: Currently work in progress."
    exit
-elif [[ $1 == "manual" ]]; then
+elif [[ $1 == "manual" ]] || [[ $1 == "" ]]; then
    true
 elif [[ $1 != "" ]]; then
    echo "generate-rsakey: Unsupported option. Either 'manual', 'divio' or 'railway' only."
