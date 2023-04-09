@@ -10,17 +10,25 @@ fi
 sleep 2
 
 # Let Rocket bind the PORT defined on our Dockerfile
+# TODO: Hardcode ROCKET_PORT for our proxy server (Caddy)
 export ROCKET_PORT="${PORT:-"8080"}"
 
 # While its possible to write stuff in the epherimal storage, we prefer to keep these disabled.
 # We'll do some if-then statements if you configured these in the future.
 export ORG_ATTACHMENT_LIMIT=${ORG_ATTACHMENT_LIMIT:-"0"}
 export USER_ATTACHMENT_LIMIT=${USER_ATTACHMENT_LIMIT:-"0"}
+
 # allow icons to be cached on our container in meanwhile
 export DISABLE_ICON_DOWNLOAD=false
-# Icon caches management
-export ICON_CACHE_TTL=${ICON_CACHE_TTL:-"120"}
-export ICON_CACHE_NEGTTL=${ICON_CACHE_NEGTTL:-"0"}
+
+# Icon cache management
+export ICON_CACHE_TTL=${ICON_CACHE_TTL:-"120"} ICON_CACHE_NEGTTL=${ICON_CACHE_NEGTTL:-"0"}
+
+# Org event logs (upstream: https://bitwarden.com/help/event-logs/)
+export ORG_EVENTS_ENABLED=true EVENTS_DAYS_RETAIN=${EVENTS_DAYS_RETAIN:-"14"}
+
+# hold groups within orgs until future announcements
+export ORG_GROUPS_ENABLED=false
 
 if [[ $CF_PROXY == true ]]; then
   export IP_HEADER=CF-Connecting-IP
@@ -68,6 +76,8 @@ if [[ "${I_REALLY_WANT_VOLATILE_STORAGE}" == "true" ]]; then
 elif [[ "${I_REALLY_WANT_VOLATILE_STORAGE}" != "true" ]] && [[ "${SAFETY_LOCK_CODE}" == "$(cat /etc/safety-lock/datadir/code.txt)" ]]; then
   echo "error: To avoid data loss, either setup an container volume for the data directory or"
   echo "error: set I_REALLY_WANT_VOLATILE_STORAGE to true, assuming you know what you're doing."
+  echo "error: In meanwhile, use the following as to disarm the safety lock (this is a bit insecure, but we know it)"
+  echo "error: until we worked on Docker volume detection in the startup script."
   exit 1
 fi
 

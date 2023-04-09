@@ -2,8 +2,8 @@
 # Create using wellbuilt vaultwarden Docker image as the base image
 # Modify vaultwarden-startup to suit in your PaaS service you are using to
 # deploy this
-ARG VAULTWARDEN_RELEASE=1.27.0
-FROM vaultwarden/server:${VAULTWARDEN_RELEASE}-alpine
+ARG VAULTWARDEN_RELEASE=1.28.1
+FROM ghcr.io/dani-garcia/vaultwarden:${VAULTWARDEN_RELEASE}-alpine
 
 COPY src/ /
 
