@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "vivaxy.vscode-conventional-commits",
+        "eamodio.gitlens",
+        "redhat.vscode-yaml",
+        "github.vscode-github-actions",
+        "ms-azuretools.vscode-docker",
+        "matthewpi.caddyfile-support"
+    ]
+}

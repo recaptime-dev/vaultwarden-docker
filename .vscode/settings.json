@@ -1,0 +1,23 @@
+{
+    "conventionalCommits.scopes": [
+        "docker",
+        "upstream",
+        "gitlab-ci",
+        "github-actions",
+        "global"
+    ],
+    "conventionalCommits.gitmoji": true,
+    "conventionalCommits.emojiFormat": "emoji",
+    "git.alwaysSignOff": true,
+    "gitlens.remotes": [
+        {
+          "domain": "github.com",
+          "name": "GitHub",
+        },
+        {
+            "domain": "mau.dev",
+            "name": "GitLab"
+        }
+    ],
+    "conventionalCommits.autoCommit": false
+}
