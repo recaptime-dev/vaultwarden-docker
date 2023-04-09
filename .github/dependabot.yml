@@ -13,6 +13,7 @@ updates:
       # if using your own robot account, change this into your
       # service account's GitHub username
       - "RecapTimeBot"
+      - ajhalili2006
   # Also our Dockerfiles should be up-to-date too
   - package-ecosystem: "docker"
     directory: "/"
@@ -26,3 +27,4 @@ updates:
       # if using your own robot account, change this into your
       # service account's GitHub username
       - "RecapTimeBot"
+      - ajhalili2006
