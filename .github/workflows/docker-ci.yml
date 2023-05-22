@@ -37,7 +37,7 @@ jobs:
 
       - name: Install CLI
         uses: dopplerhq/cli-action@41106dbef2e821dcf2250b0c936a616a438a278a
-      - uses: dopplerhq/secrets-fetch-action@ff1719d1b7d1e1b0e44f24dcfec3a9b490ede905
+      - uses: dopplerhq/secrets-fetch-action@41d4e028164b97f7ae21b1893107b59a81264fdc
         id: doppler
         if: github.event_name != 'pull_request'
         with:
