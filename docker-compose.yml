@@ -7,7 +7,7 @@ services:
     container_name: vaultwarden
     restart: unless-stopped # change this to always if needed, but please use f**king Kubernetes instead.
     environment:
-      - WEBSOCKET_ENABLED=true # Enable WebSocket notifications on local deployments. Proxying stuff in Railway is gonna be bloddy hell.
+      - WEBSOCKET_ENABLED=false # I might consider bundling Caddy soon.
       - LOG_FILE=/data/access.log
     volumes:
       - ./data/vaultwarden-appdata:/data # Vaultvarden data
@@ -16,10 +16,17 @@ services:
       - ./data/caddy-data:/data # caddy data
     # adjust ports if you're not doing the Caddy setup or for some reasons
     ports:
-      - 80:80  # Needed for the ACME HTTP-01 challenge.
-      - 443:443
+      - 8765:8765
     env_file: 
-      - caddy.env
       - .env
   db:
     image: postgres:13-alpine
+    volumes:
+      - vault-postgres:/var/lib/postgresql/data
+    environment:
+      # DO NOT USE THIS IN PRODUCTION!
+      - POSTGRES_PASSWORD=9bc7688f0cad8aa57abe86bd379d99eb07bf43c89467fdfc
+      - POSTGRES_DB=vaultwarden
+
+volumes:
+  vault-postgres:
