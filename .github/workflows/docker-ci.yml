@@ -5,7 +5,8 @@ on:
   #schedule:
   #  - cron: '30 3 * * *'
   push:
-    branches: [ main, 'ajhalili2006/**' ]
+    branches:
+      - "*"
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
     # TODO: use paths-filter action later
@@ -20,7 +21,7 @@ on:
 env:
   RHQCR_NAMESPACE: recaptime-dev/vaultwarden
   GITLAB_MAUDEV_NAMESPACE: recaptime/infra/docker/vaultwarden
-  GHCR_NAMESPACE: recaptime/vaultwarden-docker
+  GHCR_NAMESPACE: recaptime-dev/vaultwarden-docker
   DOCKERHUB_NAMESPACE: ajhalili2006 # TODO: Update this before I add Docker Hub login stuff.
 
 jobs:
@@ -77,20 +78,26 @@ jobs:
           github-token: ${{github.token}}
           images: |
             ghcr.io/${{ env.GHCR_NAMESPACE }}
-            dock.mau.dev/${{ env.GITLAB_MAUDEV_NAMESPACE }}
             quay.io/${{ env.RHQCR_NAMESPACE }}
           labels: |
-            org.opencontainers.image.vendor=Andrei Jiroh Halili
+            org.opencontainers.image.vendor=Recap Time Squad
+            org.opencontainers.image.authors=Andrei Jiroh Halili
+            org.opencontainers.image.title=RecapTime.dev's Vaultwarden Docker image
+            org.opencontainers.image.description=Custom Vaultwarden image, as used by Recap Time Squad for their instance.
           tags: |
             type=ref,prefix=branch-,event=branch
             type=sha,format=long,prefix=commit-
             type=raw,value=latest,enable={{is_default_branch}}
+            type=schedule,pattern=nightly
+            type=schedule,pattern={{date 'YYYYMMDDhhmmss'}},prefix=nightly-
 
       # Then set up QEMU and Buildx so the Build and push action below will not trigger errors
       - name: Set up QEMU
         uses: docker/setup-qemu-action@9d429d4c1cda1009cb0bee249cf42bef72a9228d
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@a946f06b5ddbde456d0115dc585e8dc3c7a0c3e0
+      
+      # TODO: Fetch latest release via GitHub API
         
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -102,3 +109,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: true
+          #build-args: |
+          #  VAULTWARDEN_RELEASE=TODO
