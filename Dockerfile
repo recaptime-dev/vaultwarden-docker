@@ -1,8 +1,5 @@
-##################  RUNTIME IMAGE  ###################
-# Create using wellbuilt vaultwarden Docker image as the base image
-# Modify vaultwarden-startup to suit in your PaaS service you are using to
-# deploy this
-ARG VAULTWARDEN_RELEASE=1.28.1
+# syntax=docker/dockerfile:1
+ARG VAULTWARDEN_RELEASE=1.29.0
 FROM ghcr.io/dani-garcia/vaultwarden:${VAULTWARDEN_RELEASE}-alpine
 
 COPY src/ /
