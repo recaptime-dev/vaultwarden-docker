@@ -80,7 +80,7 @@ jobs:
           images: |
             ghcr.io/${{ env.GHCR_NAMESPACE }}
             quay.io/${{ env.RHQCR_NAMESPACE }}
-            dock.mau.dev/
+            dock.mau.dev/${{ env.GITLAB_MAUDEV_NAMESPACE }}
           labels: |
             org.opencontainers.image.vendor=RecapTime.dev
             org.opencontainers.image.authors=~ajhalili2006
