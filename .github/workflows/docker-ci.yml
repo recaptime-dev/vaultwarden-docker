@@ -13,6 +13,7 @@ on:
     paths:
       - "Dockerfile"
       - "vaultwarden-startup"
+      - "src/*"
       - ".github/workflows/docker-ci.yml"
   pull_request:
     branches: [ main ]
@@ -20,7 +21,7 @@ on:
 
 env:
   RHQCR_NAMESPACE: recaptime-dev/vaultwarden
-  GITLAB_MAUDEV_NAMESPACE: recaptime/infra/docker/vaultwarden
+  GITLAB_MAUDEV_NAMESPACE: recaptime-dev/infra/docker/vaultwarden
   GHCR_NAMESPACE: recaptime-dev/vaultwarden-docker
   DOCKERHUB_NAMESPACE: ajhalili2006 # TODO: Update this before I add Docker Hub login stuff.
 
@@ -79,9 +80,10 @@ jobs:
           images: |
             ghcr.io/${{ env.GHCR_NAMESPACE }}
             quay.io/${{ env.RHQCR_NAMESPACE }}
+            dock.mau.dev/${{ env.GITLAB_MAUDEV_NAMESPACE }}
           labels: |
-            org.opencontainers.image.vendor=Recap Time Squad
-            org.opencontainers.image.authors=Andrei Jiroh Halili
+            org.opencontainers.image.vendor=RecapTime.dev
+            org.opencontainers.image.authors=~ajhalili2006
             org.opencontainers.image.title=RecapTime.dev's Vaultwarden Docker image
             org.opencontainers.image.description=Custom Vaultwarden image, as used by Recap Time Squad for their instance.
           tags: |
