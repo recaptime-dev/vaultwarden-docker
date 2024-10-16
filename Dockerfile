@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG VAULTWARDEN_RELEASE=1.30.5
+ARG VAULTWARDEN_RELEASE=1.32.2
 FROM ghcr.io/dani-garcia/vaultwarden:${VAULTWARDEN_RELEASE}-alpine
 
 COPY src/ /
