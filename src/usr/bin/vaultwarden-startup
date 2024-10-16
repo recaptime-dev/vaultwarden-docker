@@ -22,13 +22,13 @@ export USER_ATTACHMENT_LIMIT=${USER_ATTACHMENT_LIMIT:-"0"}
 export DISABLE_ICON_DOWNLOAD=false
 
 # Icon cache management
-export ICON_CACHE_TTL=${ICON_CACHE_TTL:-"120"} ICON_CACHE_NEGTTL=${ICON_CACHE_NEGTTL:-"0"}
+export ICON_CACHE_TTL=${ICON_CACHE_TTL:-"300"} ICON_CACHE_NEGTTL=${ICON_CACHE_NEGTTL:-"0"}
 
 # Org event logs (upstream: https://bitwarden.com/help/event-logs/)
-export ORG_EVENTS_ENABLED=true EVENTS_DAYS_RETAIN=${EVENTS_DAYS_RETAIN:-"14"}
+export ORG_EVENTS_ENABLED=true EVENTS_DAYS_RETAIN=${EVENTS_DAYS_RETAIN:-"90"}
 
 # hold groups within orgs until future announcements
-export ORG_GROUPS_ENABLED=false
+export ORG_GROUPS_ENABLED=${ORG_GROUPS_ENABLED:-"true"}
 
 if [[ $CF_PROXY == true ]]; then
   export IP_HEADER=CF-Connecting-IP
@@ -51,7 +51,8 @@ echo "==> Checking for RSA_CONTENT..."
 sleep 3
 if [ -z "${RSA_CONTENT}" ]; then
   echo "warn: RSA_CONTENT is missing, so you'll be logged out after leaving the web vault page."
-  echo "warn: To remove this warning, please run './tools/generate-rsakey ${DEPLOY_METHOD}' on your machine" 
+  echo "warn: To remove this warning, please run './tools/generate-rsakey ${DEPLOY_METHOD}' from"
+  echo "warn: this Docker image's git sources"
 else
   echo "info: RSA_CONTENT found, attempting to decode..."
   if echo "${RSA_CONTENT}" | base64 -d | tar zxf -; then
