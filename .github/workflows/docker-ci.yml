@@ -115,6 +115,8 @@ jobs:
 
           # Set the tag name as a GitHub Actions output
           echo "VAULTWARDEN_RELEASE=$tag_name" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ github.token }}
         
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
