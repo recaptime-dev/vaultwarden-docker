@@ -2,8 +2,8 @@ name: Docker CI
 
 on:
   # Disabled cronjobs first until we configured the change detection logic.
-  #schedule:
-  #  - cron: '30 3 * * *'
+  schedule:
+    - cron: '30 3 * * *'
   push:
     branches:
       - "*"
@@ -23,7 +23,6 @@ env:
   RHQCR_NAMESPACE: recaptime-dev/vaultwarden
   GITLAB_MAUDEV_NAMESPACE: recaptime-dev/infra/docker/vaultwarden
   GHCR_NAMESPACE: recaptime-dev/vaultwarden-docker
-  DOCKERHUB_NAMESPACE: ajhalili2006 # TODO: Update this before I add Docker Hub login stuff.
 
 jobs:
   docker-build:
@@ -83,7 +82,7 @@ jobs:
             dock.mau.dev/${{ env.GITLAB_MAUDEV_NAMESPACE }}
           labels: |
             org.opencontainers.image.vendor=RecapTime.dev
-            org.opencontainers.image.authors=~ajhalili2006
+            org.opencontainers.image.authors=Andrei Jiroh Halili
             org.opencontainers.image.title=RecapTime.dev's Vaultwarden Docker image
             org.opencontainers.image.description=Custom Vaultwarden image, as used by Recap Time Squad for their instance.
           tags: |
@@ -99,7 +98,23 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5
       
-      # TODO: Fetch latest release via GitHub API
+      # Fetch latest release via GitHub GraphQL API
+      # Note: Script generated with GitHub Copilot
+      - name: Get latest release
+        run: |
+          # Run the GitHub CLI command and extract the tag name using jq
+          tag_name=$(gh api graphql -f query='{
+            repository(owner: "dani-garcia", name: "vaultwarden") {
+              releases(first: 1) {
+                nodes {
+                  tagName
+                }
+              }
+            }
+          }' --jq '.data.repository.releases.nodes[0].tagName')
+
+          # Set the tag name as a GitHub Actions output
+          echo "VAULTWARDEN_RELEASE=$tag_name" >> $GITHUB_ENV
         
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -111,5 +126,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: true
-          #build-args: |
-          #  VAULTWARDEN_RELEASE=TODO
+          build-args: |
+            VAULTWARDEN_RELEASE=${{ env.VAULTWARDEN_RELEASE }}

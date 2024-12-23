@@ -77,8 +77,9 @@ if [[ "${I_REALLY_WANT_VOLATILE_STORAGE}" == "true" ]]; then
 elif [[ "${I_REALLY_WANT_VOLATILE_STORAGE}" != "true" ]] && [[ "${SAFETY_LOCK_CODE}" == "$(cat /etc/safety-lock/datadir/code.txt)" ]]; then
   echo "error: To avoid data loss, either setup an container volume for the data directory or"
   echo "error: set I_REALLY_WANT_VOLATILE_STORAGE to true, assuming you know what you're doing."
-  echo "error: In meanwhile, use the following as to disarm the safety lock (this is a bit insecure, but we know it)"
-  echo "error: until we worked on Docker volume detection in the startup script."
+  echo "error: In meanwhile, use the following code below to disarm the safety lock (this is a bit insecure"
+  echo "error: but we know it) error: until we worked on Docker volume detection in the startup script."
+  echo "error:     SAFETY_LOCK_CODE=$(cat /etc/safety-lock/datadir/code.txt)"
   exit 1
 fi
 
