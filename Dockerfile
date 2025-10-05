@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
-ARG VAULTWARDEN_RELEASE=1.32.2
+ARG VAULTWARDEN_RELEASE=1.34.3
 FROM ghcr.io/dani-garcia/vaultwarden:${VAULTWARDEN_RELEASE}-alpine
 
 COPY src/ /
 
-ENV PORT 3000
+ENV PORT=3000
 EXPOSE 3000
 
 ## because vaultwarden-startup requires bash, so we install that
